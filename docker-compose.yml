@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  nginx:
+    image: library/nginx:1.19-alpine
+    ports:
+      - 127.0.0.1:8080:80
+    volumes:
+      - "./config/nginx.conf:/etc/nginx/conf.d/default.conf"
+      - "./backend:/var/www/html"
+  php:
+    build: ./images/php
+    volumes:
+      - "./config/php:/etc/php81"
+      - "./backend:/var/www/html"
+  postgres:
+    restart: always
+    image: postgres:latest
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: url
+      POSTGRES_INITDB_ARGS: "-U postgres --encoding=UTF8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+      - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql
